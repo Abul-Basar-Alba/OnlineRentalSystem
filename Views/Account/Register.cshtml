@@ -1,0 +1,83 @@
+﻿@using OnlineRentalSystem.ViewModels
+@model RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_Layout.cshtml"; // Ensure this matches your layout file
+}
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+            <h3 class="text-center">Create your PIIS account</h3>
+            <hr  />
+            
+        <form asp-controller="Account" asp-action="Register" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" class="space-y-6">
+            <div asp-validation-summary="All" class="text-danger"></div> @* Use All to show all Identity errors *@
+
+            <div class="form-group">
+                <label class="control-label" for="FirstName">First Name</label>
+                    <input class="form-control" asp-for="FirstName" />
+                <span class="text-danger" asp-validation-for="FirstName" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="LastName">Last Name</label>
+                <input class="form-control" asp-for="LastName" />
+                <span class="text-danger" asp-validation-for="LastName" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="Address">Your Address</label>
+                <input class="form-control" asp-for="Address" />
+                <span class="text-danger" asp-validation-for="Address" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="City">Your City</label>
+                <input class="form-control" asp-for="City" />
+                <span class="text-danger" asp-validation-for="City" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="Country">Your Country</label>
+                <input class="form-control" asp-for="Country" />
+                <span class="text-danger" asp-validation-for="Country" ></span>
+            </div>
+            
+
+            <div class="form-control">
+                <label class="control-label" for="Email">Email</label>
+                <input class="form-control" asp-for="Email" />
+                <span class="text-danger" asp-validation-for="Email" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="Password">Password</label>
+                <input class="form-control" asp-for="Password" type="password" />
+                <span class="text-danger" asp-validation-for="Password" ></span>
+            </div>
+
+            <div class="form-control">
+                <label class="control-label" for="ConfirmPassword">Confirm Password</label>
+                <input class="form-control" asp-for="ConfirmPassword" type="password" />
+                <span class="text-danger" asp-validation-for="ConfirmPassword" ></span>
+            </div>
+
+            <div class="form-control">
+                <button type="submit" class="btn btn-primary">Register</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -4,7 +4,6 @@ using OnlineRentalSystem.Models;
 using OnlineRentalSystem.Models.Identity;
 using OnlineRentalSystem.Models.Rental;
 
-
 namespace OnlineRentalSystem.Data // Updated namespace
 {
     // ApplicationDbContext extends IdentityDbContext to include Identity tables
@@ -29,81 +28,81 @@ namespace OnlineRentalSystem.Data // Updated namespace
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure the many-to-many relationship for Property and Amenity
-            // using the PropertyAmenity junction table.
+            // Configure unique index for ReferenceID
+            modelBuilder.Entity<Property>()
+                .HasIndex(p => p.ReferenceID)
+                .IsUnique()
+                .HasFilter("[ReferenceID] IS NOT NULL");
+
+            // Configure PropertyAmenity
             modelBuilder.Entity<PropertyAmenity>()
-                .HasKey(pa => pa.PropertyAmenityId); // Use a surrogate key for the join table
+                .HasKey(pa => pa.PropertyAmenityId);
 
             modelBuilder.Entity<PropertyAmenity>()
                 .HasOne(pa => pa.Property)
                 .WithMany(p => p.PropertyAmenities)
-                .HasForeignKey(pa => pa.PropertyId);
+                .HasForeignKey(pa => pa.PropertyId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<PropertyAmenity>()
                 .HasOne(pa => pa.Amenity)
                 .WithMany(a => a.PropertyAmenities)
-                .HasForeignKey(pa => pa.AmenityId);
+                .HasForeignKey(pa => pa.AmenityId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure relationships for ApplicationUser
+            // Configure ApplicationUser relationships
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.Bookings)
                 .WithOne(b => b.Booker)
                 .HasForeignKey(b => b.BookerId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete on user deletion if bookings exist
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.PropertiesListed)
                 .WithOne(p => p.Owner)
                 .HasForeignKey(p => p.OwnerId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete on user deletion if properties exist
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.ReviewsWritten)
                 .WithOne(r => r.Reviewer)
                 .HasForeignKey(r => r.ReviewerId)
-                .OnDelete(DeleteBehavior.Restrict); // Prevent cascade delete on user deletion if reviews exist
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Property to PropertyType relationship
+            // Configure Property to PropertyType
             modelBuilder.Entity<Property>()
                 .HasOne(p => p.PropertyType)
                 .WithMany(pt => pt.Properties)
                 .HasForeignKey(p => p.PropertyTypeId)
-                .OnDelete(DeleteBehavior.Restrict); // Or .Cascade, depending on your business logic
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Booking to Property relationship
+            // Configure Booking to Property
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Property)
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(b => b.PropertyId)
-                .OnDelete(DeleteBehavior.Restrict); // Or .Cascade
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configure Payment to Booking relationship
+            // Configure Payment to Booking
             modelBuilder.Entity<Payment>()
                 .HasOne(py => py.Booking)
                 .WithMany(b => b.Payments)
                 .HasForeignKey(py => py.BookingId)
-                .OnDelete(DeleteBehavior.Cascade); // Payments should be deleted if booking is deleted
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Review to Property relationship
+            // Configure Review to Property
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Property)
                 .WithMany(p => p.Reviews)
                 .HasForeignKey(r => r.PropertyId)
-                .OnDelete(DeleteBehavior.Cascade); // Reviews might be deleted if property is deleted
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Configure Image to Property relationship
+            // Configure Image to Property
             modelBuilder.Entity<Image>()
                 .HasOne(i => i.Property)
                 .WithMany(p => p.Images)
                 .HasForeignKey(i => i.PropertyId)
-                .OnDelete(DeleteBehavior.Cascade); // Images should be deleted if property is deleted
-
-            // If you have specific table names you want to enforce for Identity tables,
-            // you can do it here. By default, IdentityDbContext creates tables like AspNetUsers, etc.
-            // For example:
-            // modelBuilder.Entity<ApplicationUser>().ToTable("Users");
-            // modelBuilder.Entity<IdentityRole>().ToTable("Roles");
-            // etc.
-        }
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }

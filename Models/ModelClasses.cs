@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OnlineRentalSystem.Models.Identity;
 using OnlineRentalSystem.Models.Rental;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -72,9 +73,8 @@ namespace OnlineRentalSystem.Models.Rental // Updated namespace
 // --- 3. Rental/Property.cs ---
 // Updated namespace
 
-namespace OnlineRentalSystem.Models.Rental // Updated namespace
+namespace OnlineRentalSystem.Models.Rental
 {
-    // Represents a single rental item/property
     public class Property
     {
         [Key]
@@ -90,7 +90,7 @@ namespace OnlineRentalSystem.Models.Rental // Updated namespace
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal PricePerDay { get; set; } // Or PricePerHour, adjust as needed
+        public decimal PricePerDay { get; set; }
 
         [Required]
         [StringLength(255)]
@@ -116,23 +116,25 @@ namespace OnlineRentalSystem.Models.Rental // Updated namespace
         [DataType(DataType.Date)]
         public DateTime DateAdded { get; set; } = DateTime.UtcNow;
 
-        // Foreign Key to PropertyType
+        [Required]
         public Guid PropertyTypeId { get; set; }
+        [ForeignKey("PropertyTypeId")]
         public PropertyType PropertyType { get; set; }
 
-        // Foreign Key to the user who owns/listed this property
         [Required]
-        public string OwnerId { get; set; } // Matches IdentityUser.Id type (string)
+        public string OwnerId { get; set; }
+        [ForeignKey("OwnerId")]
         public ApplicationUser Owner { get; set; }
 
-        // Navigation properties
+        [StringLength(50)]
+        public string ReferenceID { get; set; }
+
         public ICollection<Image> Images { get; set; }
         public ICollection<Booking> Bookings { get; set; }
         public ICollection<Review> Reviews { get; set; }
-        public ICollection<PropertyAmenity> PropertyAmenities { get; set; } // Junction for Amenities
+        public ICollection<PropertyAmenity> PropertyAmenities { get; set; }
     }
 }
-
 
 // --- 4. Rental/Amenity.cs ---
 

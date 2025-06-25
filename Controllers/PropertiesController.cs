@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineRentalSystem.Data;
 using OnlineRentalSystem.Models.Rental;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace OnlineRentalSystem.Controllers
 {
@@ -22,28 +21,30 @@ namespace OnlineRentalSystem.Controllers
         // GET: Properties
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Properties.Include(p => p.Owner).Include(p => p.PropertyType);
+            var applicationDbContext = _context.Properties
+                .Include(p => p.Owner)
+                .Include(p => p.PropertyType);
             return View(await applicationDbContext.ToListAsync());
         }
 
         // GET: Properties/Details/5
         public async Task<IActionResult> Details(Guid id)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 return NotFound();
             }
 
-            var @property = await _context.Properties
+            var property = await _context.Properties
                 .Include(p => p.Owner)
                 .Include(p => p.PropertyType)
                 .FirstOrDefaultAsync(m => m.PropertyId == id);
-            if (@property == null)
+            if (property == null)
             {
                 return NotFound();
             }
 
-            return View(@property);
+            return View(property);
         }
 
         // GET: Properties/Create
@@ -55,49 +56,46 @@ namespace OnlineRentalSystem.Controllers
         }
 
         // POST: Properties/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PropertyId,Title,Description,PricePerDay,Address,City,StateOrProvince,Country,ZipCode,IsAvailable,DateAdded,PropertyTypeId,OwnerId")] Property @property)
+        public async Task<IActionResult> Create([Bind("PropertyId,Title,Description,PricePerDay,Address,City,StateOrProvince,Country,ZipCode,IsAvailable,DateAdded,PropertyTypeId,OwnerId,ReferenceID")] Property property)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(@property);
+                property.PropertyId = Guid.NewGuid();
+                _context.Add(property);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", @property.OwnerId);
-            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", @property.PropertyTypeId);
-            return View(@property);
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", property.OwnerId);
+            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", property.PropertyTypeId);
+            return View(property);
         }
 
         // GET: Properties/Edit/5
         public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 return NotFound();
             }
 
-            var @property = await _context.Properties.FindAsync(id);
-            if (@property == null)
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null)
             {
                 return NotFound();
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", @property.OwnerId);
-            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", @property.PropertyTypeId);
-            return View(@property);
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", property.OwnerId);
+            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", property.PropertyTypeId);
+            return View(property);
         }
 
         // POST: Properties/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("PropertyId,Title,Description,PricePerDay,Address,City,StateOrProvince,Country,ZipCode,IsAvailable,DateAdded,PropertyTypeId,OwnerId")] Property @property)
+        public async Task<IActionResult> Edit(Guid id, [Bind("PropertyId,Title,Description,PricePerDay,Address,City,StateOrProvince,Country,ZipCode,IsAvailable,DateAdded,PropertyTypeId,OwnerId,ReferenceID")] Property property)
         {
-            if (id != @property.PropertyId)
+            if (id != property.PropertyId)
             {
                 return NotFound();
             }
@@ -106,12 +104,12 @@ namespace OnlineRentalSystem.Controllers
             {
                 try
                 {
-                    _context.Update(@property);
+                    _context.Update(property);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PropertyExists(@property.PropertyId))
+                    if (!PropertyExists(property.PropertyId))
                     {
                         return NotFound();
                     }
@@ -122,43 +120,42 @@ namespace OnlineRentalSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", @property.OwnerId);
-            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", @property.PropertyTypeId);
-            return View(@property);
+            ViewData["OwnerId"] = new SelectList(_context.Users, "Id", "UserName", property.OwnerId);
+            ViewData["PropertyTypeId"] = new SelectList(_context.PropertyTypes, "PropertyTypeId", "Name", property.PropertyTypeId);
+            return View(property);
         }
 
         // GET: Properties/Delete/5
         public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 return NotFound();
             }
 
-            var @property = await _context.Properties
+            var property = await _context.Properties
                 .Include(p => p.Owner)
                 .Include(p => p.PropertyType)
                 .FirstOrDefaultAsync(m => m.PropertyId == id);
-            if (@property == null)
+            if (property == null)
             {
                 return NotFound();
             }
 
-            return View(@property);
+            return View(property);
         }
 
         // POST: Properties/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(Guid id) // Fixed from int to Guid
         {
-            var @property = await _context.Properties.FindAsync(id);
-            if (@property != null)
+            var property = await _context.Properties.FindAsync(id);
+            if (property != null)
             {
-                _context.Properties.Remove(@property);
+                _context.Properties.Remove(property);
+                await _context.SaveChangesAsync();
             }
-
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,7 +1,24 @@
-/* Custom styles for OnlineRentalSystem */
+﻿/* Custom styles for OnlineRentalSystem */
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f8f9fa;
+    background: linear-gradient(45deg, #2563eb, #85c1e9, #1d4ed8, #93c5fd);
+    background-size: 400% 400%;
+    animation: gradientAnimation 15s ease infinite;
+    min-height: 100vh; 
+}
+
+@keyframes gradientAnimation {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
 .navbar-brand {

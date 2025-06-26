@@ -1,0 +1,105 @@
+﻿@using OnlineRentalSystem.Models.Rental 
+@model Booking
+
+@{
+    ViewData["Title"] = "Booking Confirmation";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-5 display-4 fw-bold text-success">
+                <i class="bi bi-check-circle-fill me-3"></i> Booking Confirmed!
+            </h1>
+
+            <div class="alert alert-success text-center mb-4" role="alert">
+                Your booking for **@Model.Property.Title** has been successfully placed.
+                A confirmation email with all details will be sent to **@Model.Booker.Email** shortly.
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white fw-bold">
+                    Booking Details
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Booking ID:</dt>
+                        <dd class="col-sm-8">@Model.BookingId</dd>
+
+                        <dt class="col-sm-4">Status:</dt>
+                        <dd class="col-sm-8">
+                            <span class="badge bg-@(@Model.Status == "Confirmed" ? "success" : "warning")">@Model.Status</span>
+                        </dd>
+
+                        <dt class="col-sm-4">Booking Date:</dt>
+                        <dd class="col-sm-8">@Model.BookingDate.ToShortDateString() @Model.BookingDate.ToShortTimeString()</dd>
+
+                        <dt class="col-sm-4">Check-in Date:</dt>
+                        <dd class="col-sm-8">@Model.StartDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">Check-out Date:</dt>
+                        <dd class="col-sm-8">@Model.EndDate.ToShortDateString()</dd>
+
+                        <dt class="col-sm-4">Total Price:</dt>
+                        <dd class="col-sm-8 fw-bold text-primary fs-5">
+                            @Model.TotalPrice.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("en-BD"))
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white fw-bold">
+                    Property Details
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Property Name:</dt>
+                        <dd class="col-sm-8">@Model.Property.Title</dd>
+
+                        <dt class="col-sm-4">Description:</dt>
+                        <dd class="col-sm-8">@Model.Property.Description</dd>
+
+                        <dt class="col-sm-4">Address:</dt>
+                        <dd class="col-sm-8">@Model.Property.Address, @Model.Property.City, @Model.Property.Country</dd>
+
+                        <dt class="col-sm-4">Price per Day:</dt>
+                        <dd class="col-sm-8">@Model.Property.PricePerDay.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("en-BD"))</dd>
+
+                        @* Display first image if available *@
+                        @if (Model.Property.Images != null && Model.Property.Images.Any())
+                        {
+                            <dt class="col-sm-4">Image:</dt>
+                            <dd class="col-sm-8">
+                                <img src="@Model.Property.Images.FirstOrDefault().ImageUrl" alt="@Model.Property.Images.FirstOrDefault().AltText" class="img-thumbnail" style="max-height: 150px; object-fit: cover;" />
+                            </dd>
+                        }
+                        else
+                        {
+                            <dt class="col-sm-4">Image:</dt>
+                            <dd class="col-sm-8">
+                                <img src="/images/placeholder-property.jpg" alt="No image available" class="img-thumbnail" style="max-height: 150px; object-fit: cover;" />
+                            </dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a asp-controller="Bookings" asp-action="Index" class="btn btn-secondary btn-lg me-3">
+                    <i class="bi bi-list-ul me-2"></i> View My Bookings
+                </a>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-house me-2"></i> Go to Home
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Ensure Bootstrap Icons CSS is linked in _Layout.cshtml for icons to display.
+        // Example: <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    </script>
+}

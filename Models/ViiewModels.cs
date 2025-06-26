@@ -2,6 +2,34 @@
 
 namespace OnlineRentalSystem.ViewModels
 {
+    public class BookingViewModel
+    {
+        [Required]
+        public Guid PropertyId { get; set; }
+
+        // Properties for displaying property details (optional, populated by controller)
+        public string PropertyTitle { get; set; }
+        public string PropertyDescription { get; set; }
+        public decimal PropertyPricePerDay { get; set; }
+        public string PropertyImageUrl { get; set; } // URL of the main image
+
+        [Required(ErrorMessage = "Start Date is required.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Check-in Date")]
+        public DateTime? StartDate { get; set; }
+
+        [Required(ErrorMessage = "End Date is required.")]
+        [DataType(DataType.Date)]
+        [Display(Name = "Check-out Date")]
+        public DateTime? EndDate { get; set; }
+
+        [Display(Name = "Total Price")]
+        [DataType(DataType.Currency)]
+        public decimal TotalPrice { get; set; } // Will be calculated dynamically
+
+        // Optional: BookerId will be populated by the controller from the logged-in user
+        // public string BookerId { get; set; }
+    }
     public class RegisterViewModel
     {
         [Required]

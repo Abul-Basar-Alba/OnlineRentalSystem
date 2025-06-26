@@ -46,9 +46,18 @@ namespace OnlineRentalSystem.Controllers
         }
 
         // GET: Images/Create
-        public IActionResult Create()
+        public IActionResult Create(Guid? propertyId)
         {
-            ViewData["PropertyId"] = new SelectList(_context.Properties, "PropertyId", "Title");
+            if (propertyId != null && Guid.Empty != propertyId)
+            {
+                ViewData["PropertyId"] = new SelectList(_context.Properties, "PropertyId", "Title", propertyId);
+
+            }
+            else
+            {
+                ViewData["PropertyId"] = new SelectList(_context.Properties, "PropertyId", "Title");
+
+            }
             return View();
         }
 

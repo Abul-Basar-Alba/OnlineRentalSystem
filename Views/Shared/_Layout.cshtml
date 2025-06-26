@@ -1,4 +1,17 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using OnlineRentalSystem.Models.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@{
+    var currentUser = new ApplicationUser();
+    if (SignInManager.IsSignedIn(User))
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -19,6 +32,25 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            // Get the current ApplicationUser object
+
+                            @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Seller"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Properties" asp-action="Index">Listings</a>
+                                </li>
+                            }
+                            @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Buyer"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Bookings" asp-action="Index">Bookings</a>
+                                </li>
+                            }
+
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Properties" asp-action="Index">Listings</a>
                         </li>

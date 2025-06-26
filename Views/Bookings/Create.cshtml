@@ -1,63 +1,162 @@
-﻿@model OnlineRentalSystem.Models.Rental.Booking
+﻿@using OnlineRentalSystem.ViewModels
+@model BookingViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Book Property";
 }
 
-<div class="row">
-    <div class="col-md-4">
-        </div>
-    <div class="col-md-4">
-        <h1>Create</h1>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-5 display-4 fw-bold text-primary">Book Your Stay</h1>
 
-        <h4>Booking</h4>
-        <hr />
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="StartDate" class="control-label">Start Date</label>
-                <input asp-for="StartDate" class="form-control" />
-                <span asp-validation-for="StartDate" class="text-danger"></span>
+            <div class="card shadow-sm mb-4">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img src="@Model.PropertyImageUrl" class="img-fluid rounded-start object-fit-cover h-100" alt="Property Image">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title fw-bold">@Model.PropertyTitle</h5>
+                            <p class="card-text text-muted">@Model.PropertyDescription</p>
+                            <p class="card-text">
+                                <span class="fw-bold text-success fs-5">
+                                    @Model.PropertyPricePerDay.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("en-BD"))
+                                </span> / day
+                            </p>
+                            <p class="card-text mt-auto"><small class="text-muted">ID: @Model.PropertyId</small></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EndDate" class="control-label"></label>
-                <input asp-for="EndDate" class="form-control" />
-                <span asp-validation-for="EndDate" class="text-danger"></span>
+
+            <div class="card shadow-sm p-4">
+                <h2 class="card-title text-center mb-4 fw-bold text-secondary">Select Your Dates</h2>
+                <form asp-controller="Bookings" asp-action="Create" method="post" class="needs-validation" novalidate>
+                    <input type="hidden" asp-for="PropertyId" />
+                    <input type="hidden" asp-for="PropertyPricePerDay" id="propertyPricePerDay" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="StartDate" class="form-label"></label>
+                            <input asp-for="StartDate" type="text" class="form-control datepicker" id="startDate" required>
+                            <div class="invalid-feedback">
+                                Please select a valid start date.
+                            </div>
+                            <span asp-validation-for="StartDate" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="EndDate" class="form-label"></label>
+                            <input asp-for="EndDate" type="text" class="form-control datepicker" id="endDate" onchange="calculateTotalPrice()" required>
+                            <div class="invalid-feedback">
+                                Please select a valid end date.
+                            </div>
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="totalPriceDisplay" class="form-label fw-bold fs-5">Total Price:</label>
+                        <span id="totalPriceDisplay" class="ms-2 fs-4 text-primary">0.00 BDT</span>
+                        <input type="hidden" asp-for="TotalPrice" id="calculatedTotalPrice" />
+                    </div>
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger mt-3"></div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-calendar-check me-2"></i> Confirm Booking
+                        </button>
+                    </div>
+                </form>
             </div>
-            <div class="form-group">
-                <label asp-for="TotalPrice" class="control-label"></label>
-                <input asp-for="TotalPrice" class="form-control" />
-                <span asp-validation-for="TotalPrice" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BookingDate" class="control-label"></label>
-                <input asp-for="BookingDate" class="form-control" />
-                <span asp-validation-for="BookingDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PropertyId" class="control-label"></label>
-                <select asp-for="PropertyId" class ="form-control" asp-items="ViewBag.PropertyId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="BookerId" class="control-label"></label>
-                <select asp-for="BookerId" class ="form-control" asp-items="ViewBag.BookerId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script>
+        // Initialize Flatpickr date pickers
+        flatpickr("#startDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today", // Cannot select past dates
+            onChange: function (selectedDates, dateStr, instance) {
+                // When start date changes, ensure end date is after it
+                flatpickr("#endDate").set("minDate", dateStr);
+                calculateTotalPrice(); // Recalculate when start date changes
+            }
+        });
+
+        flatpickr("#endDate", {
+            dateFormat: "Y-m-d",
+            minDate: "today", // Cannot select past dates
+            onChange: calculateTotalPrice // Recalculate when end date changes
+        });
+
+        function calculateTotalPrice() {
+            const startDateStr = document.getElementById('startDate').value;
+            const endDateStr = document.getElementById('endDate').value;
+            const pricePerDay = parseFloat(document.getElementById('propertyPricePerDay').value);
+
+            if (startDateStr && endDateStr && !isNaN(pricePerDay)) {
+                const startDate = new Date(startDateStr);
+                const endDate = new Date(endDateStr);
+
+                // Calculate difference in days (add 1 because booking is inclusive of start and end day)
+                // This logic mirrors the server-side calculation for consistency.
+                const diffTime = Math.abs(endDate - startDate); // Difference in milliseconds
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Rounds up to full days
+
+                // Ensure the number of days is at least 1 if valid dates are selected
+                let actualDays = 0;
+                if (endDate >= startDate) {
+                    actualDays = diffDays + 1; // Inclusive range (e.g., Jan 1 to Jan 1 is 1 day)
+                } else {
+                    // Invalid date range (end date before start date)
+                    document.getElementById('totalPriceDisplay').innerText = "Invalid Dates";
+                    document.getElementById('calculatedTotalPrice').value = "0.00";
+                    return; // Exit early if dates are invalid
+                }
+
+                if (actualDays > 0) {
+                    const totalPrice = pricePerDay * actualDays;
+                    document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString('en-BD', { style: 'currency', currency: 'BDT' });
+                    document.getElementById('calculatedTotalPrice').value = totalPrice.toFixed(2); // Set hidden input for submission
+                } else {
+                    document.getElementById('totalPriceDisplay').innerText = "0.00 BDT";
+                    document.getElementById('calculatedTotalPrice').value = "0.00";
+                }
+            } else {
+                document.getElementById('totalPriceDisplay').innerText = "0.00 BDT";
+                document.getElementById('calculatedTotalPrice').value = "0.00";
+            }
+        }
+
+        // Run initial calculation in case dates are pre-filled (e.g., on first load or after server-side validation error)
+        document.addEventListener('DOMContentLoaded', calculateTotalPrice);
+
+        // Bootstrap form validation (client-side)
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

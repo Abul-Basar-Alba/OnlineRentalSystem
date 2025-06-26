@@ -1,0 +1,62 @@
+﻿<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card p-4 shadow-lg rounded-3">
+                <div class="card-body">
+                    <h1 class="card-title h3 text-center mb-4 text-dark">Assign Role to User</h1>
+
+                    <!-- Message Display Area (Success/Error) -->
+                    @if (!string.IsNullOrWhiteSpace(ViewBag.Message))
+                    {
+                        <div class="alert @(ViewBag.IsSuccess ? "alert-success" : "alert-danger") alert-dismissible fade show" role="alert">
+                            @ViewBag.Message
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <!-- Form for assigning a role -->
+                    <form asp-action="AssignRoleToUser" method="post">
+                        @Html.AntiForgeryToken() <!-- Anti-forgery token for security -->
+
+                        <div class="mb-3">
+                            <label for="userId" class="form-label text-muted">Select User</label>
+                            <select id="userId" name="userId" class="form-select" required>
+                                <option value="">-- Select a User --</option>
+                                @if (ViewBag.Users != null)
+                                {
+                                    foreach (var user in ViewBag.Users as List<SelectListItem>)
+                                    {
+                                        <option value="@user.Value">@user.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label text-muted">Select Role</label>
+                            <select id="roleName" name="roleName" class="form-select" required>
+                                <option value="">-- Select a Role --</option>
+                                @if (ViewBag.Roles != null)
+                                {
+                                    foreach (var role in ViewBag.Roles as List<SelectListItem>)
+                                    {
+                                        <option value="@role.Value">@role.Text</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100 py-2 rounded-3 shadow-sm">
+                            Assign Role
+                        </button>
+                    </form>
+
+                    <p class="mt-4 text-center text-muted">
+                        <a href="#" class="text-decoration-none text-primary fw-medium rounded-3 focus:outline-none focus:shadow-sm">Back to Role Management</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

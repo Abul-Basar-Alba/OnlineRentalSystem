@@ -18,7 +18,7 @@
             {
                 // Get the current ApplicationUser object
                 var currentUser = await UserManager.GetUserAsync(User);
-                string userEmail = currentUser?.Email ?? User.Identity.Name;
+                string userEmail = $"{currentUser.FirstName} {currentUser.LastName}";
 
                 <p class="lead">Hello, <span class="fw-bold text-success">@userEmail</span>!</p>
                 <p>What would you like to do today?</p>
@@ -35,7 +35,7 @@
                     }
 
                     @* Owner Dashboard Link *@
-                    @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Owner"))
+                    @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Seller"))
                     {
                         <a class="btn btn-success btn-lg me-3 mb-2" asp-controller="Owner" asp-action="Index">
                             <i class="bi bi-house-door"></i> Owner Dashboard
@@ -43,7 +43,7 @@
                     }
 
                     @* Renter / Booker Specific Links *@
-                    @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Renter"))
+                    @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Buyer"))
                     {
                         <a class="btn btn-info btn-lg me-3 mb-2 text-white" asp-controller="Properties" asp-action="Index">
                             <i class="bi bi-search"></i> Browse Properties

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using OnlineRentalSystem.Models.Identity; // Your custom ApplicationUser model
 using OnlineRentalSystem.ViewModels; // We'll define these ViewModels below
 
@@ -150,6 +152,16 @@ namespace OnlineRentalSystem.Controllers
         {
             return View();
         }
+        
+        [HttpGet]
+        public IActionResult CreateRole()
+        {
+            return View();
+        }[HttpGet]
+        public IActionResult Admin()
+        {
+            return View();
+        }
 
         // GET: /Account/LoginWith2fa (Placeholder for 2FA)
         [HttpGet]
@@ -177,7 +189,7 @@ namespace OnlineRentalSystem.Controllers
         // --- Role Management Examples (Conceptual - you'd build UI/APIs around these) ---
 
         // Example: Create a new role
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> CreateRole(string roleName)
         {
             if (string.IsNullOrWhiteSpace(roleName))
@@ -206,34 +218,111 @@ namespace OnlineRentalSystem.Controllers
             return Ok($"Role '{roleName}' already exists.");
         }
 
+
         // Example: Assign a role to a user
+        // GET: /YourRoleManagementController/AssignRoleToUser
+        // This action will display the form to assign roles
         [HttpGet]
+        public async Task<IActionResult> AssignRoleToUser()
+        {
+            // Fetch all users and populate ViewBag.Users
+            var users = await _userManager.Users.ToListAsync();
+            ViewBag.Users = users.Select(u => new SelectListItem
+            {
+                Value = u.Id,     // The actual value sent to the controller
+                Text = u.UserName // What the user sees in the dropdown
+            }).ToList();
+
+            // Fetch all roles and populate ViewBag.Roles (useful if you want a role dropdown too)
+            var roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles = roles.Select(r => new SelectListItem
+            {
+                Value = r.Name,
+                Text = r.Name
+            }).ToList();
+
+            // Optionally set a default message or clear previous messages
+            ViewBag.Message = "";
+            ViewBag.IsSuccess = false;
+
+            return View();
+        }
+
+        // POST: /YourRoleManagementController/AssignRoleToUser
+        // This action will handle the form submission to assign the role
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Good practice for preventing cross-site request forgery attacks
         public async Task<IActionResult> AssignRoleToUser(string userId, string roleName)
         {
+            // --- Important: Re-populate ViewBag.Users and ViewBag.Roles here ---
+            // This is crucial because if validation fails, you'll return to the same view,
+            // and the dropdowns need their data populated again.
+            var users = await _userManager.Users.ToListAsync();
+            ViewBag.Users = users.Select(u => new SelectListItem
+            {
+                Value = u.Id,
+                Text = u.UserName
+            }).ToList();
+
+            var roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles = roles.Select(r => new SelectListItem
+            {
+                Value = r.Name,
+                Text = r.Name
+            }).ToList();
+            // --- End of re-population ---
+
+
+            if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(roleName))
+            {
+                ViewBag.Message = "Please select both a User and a Role.";
+                ViewBag.IsSuccess = false;
+                return View(); // Return the view with error message
+            }
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound($"User with ID '{userId}' not found.");
+                ViewBag.Message = $"User not found with ID: '{userId}'.";
+                ViewBag.IsSuccess = false;
+                return View();
             }
 
+            // Check if the role actually exists
             if (!await _roleManager.RoleExistsAsync(roleName))
             {
-                return NotFound($"Role '{roleName}' not found.");
+                ViewBag.Message = $"Role '{roleName}' does not exist.";
+                ViewBag.IsSuccess = false;
+                return View();
             }
 
+            // Check if the user already has the role to avoid errors and unnecessary operations
+            if (await _userManager.IsInRoleAsync(user, roleName))
+            {
+                ViewBag.Message = $"User '{user.UserName}' is already in role '{roleName}'.";
+                ViewBag.IsSuccess = false;
+                return View();
+            }
+
+            // Attempt to add the user to the role
             var result = await _userManager.AddToRoleAsync(user, roleName);
             if (result.Succeeded)
             {
-                Console.WriteLine($"User '{user.Email}' assigned to role '{roleName}'.");
-                return Ok($"User '{user.Email}' assigned to role '{roleName}'.");
+                Console.WriteLine($"User '{user.UserName}' successfully assigned to role '{roleName}'.");
+                ViewBag.Message = $"User '{user.UserName}' assigned to role '{roleName}' successfully!";
+                ViewBag.IsSuccess = true;
+                // Optionally, you might want to redirect to a user list or role list page
+                // return RedirectToAction("Index", "Users");
+                return View(); // Stay on the same page, showing success
             }
             else
             {
-                foreach (var error in result.Errors)
-                {
-                    Console.WriteLine($"Error assigning role: {error.Description}");
-                }
-                return BadRequest("Failed to assign role.");
+                // If there are errors during assignment, display them
+                var errors = string.Join("; ", result.Errors.Select(e => e.Description));
+                Console.WriteLine($"Error assigning role to user: {errors}");
+                ViewBag.Message = $"Failed to assign role to user: {errors}";
+                ViewBag.IsSuccess = false;
+                return View(); // Stay on the same page, showing error
             }
         }
     }

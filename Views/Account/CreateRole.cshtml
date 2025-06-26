@@ -1,0 +1,54 @@
+﻿<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card p-4 shadow-lg rounded-3">
+                <div class="card-body">
+                    <h1 class="card-title h3 text-center mb-4 text-dark">Create New Role</h1>
+
+                    <!-- Form for creating a new role -->
+                    <!--
+                        Important: The 'action' attribute should point to your controller's CreateRole action.
+                        If your controller is 'RoleController' and the action is 'CreateRole',
+                        it might look like '/Role/CreateRole' or use ASP.NET Core Tag Helpers like asp-action="CreateRole" asp-controller="Role"
+                    -->
+                    <form asp-action="CreateRole" method="post">
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label text-muted">Role Name</label>
+                            <input type="text"
+                                   id="roleName"
+                                   name="roleName"
+                                   class="form-control"
+                                   placeholder="e.g., Administrator, User, Editor"
+                                   required>
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-primary w-100 py-2 rounded-3 shadow-sm">
+                            Create Role
+                        </button>
+                    </form>
+
+                    <!-- Message display area -->
+                    <!--
+                        In a real ASP.NET Core application, you would dynamically display success/error
+                        messages here, typically passed from the controller via TempData or a ViewModel.
+                        For example:
+                    @if (ViewBag.Message != null)
+                    {
+                                <div class="mt-4 p-3 rounded-md @(ViewBag.IsSuccess ? "alert alert-success" : "alert alert-danger")">
+                            @ViewBag.Message
+                                </div>
+                    }
+                    -->
+                    <div id="messageArea" class="mt-4 text-center">
+                        <!-- Messages will appear here after form submission (if handled via AJAX) or page reload (if handled via ViewBag) -->
+                    </div>
+
+                    <p class="mt-4 text-center text-muted">
+                        <a href="#" class="text-decoration-none text-primary fw-medium rounded-3 focus:outline-none focus:shadow-sm">Back to Role Management</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -23,6 +23,7 @@ namespace OnlineRentalSystem.Controllers
         {
             var applicationDbContext = _context.Properties
                 .Include(p => p.Owner)
+                .Include(p => p.Images)
                 .Include(p => p.PropertyType);
             return View(await applicationDbContext.ToListAsync());
         }

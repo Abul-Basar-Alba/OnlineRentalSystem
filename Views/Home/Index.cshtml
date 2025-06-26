@@ -2,7 +2,7 @@
 @using OnlineRentalSystem.Models.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
-@inject RoleManager<IdentityRole> RoleManager 
+@inject RoleManager<IdentityRole> RoleManager
 
 @{
     ViewData["Title"] = "Home Page - Online Rental System";
@@ -54,7 +54,7 @@
                     }
                     else if (currentUser != null && !await UserManager.IsInRoleAsync(currentUser, "Admin") && !await UserManager.IsInRoleAsync(currentUser, "Owner"))
                     {
-                        @* Fallback for authenticated users without specific roles (e.g., if "Renter" role isn't explicitly assigned yet) *@
+                        @* Fallback for authenticated users without specific roles *@
                         <a class="btn btn-secondary btn-lg me-3 mb-2" asp-controller="Properties" asp-action="Index">
                             <i class="bi bi-list"></i> View All Listings
                         </a>
@@ -80,19 +80,18 @@
         <div class="col-md-6">
             <h2>Find Your Perfect Rental</h2>
             <p>Explore a wide variety of properties, vehicles, and equipment available for rent. Our intuitive search and booking process makes finding what you need simple and fast.</p>
-            <p><a class="btn btn-outline-secondary" href="#">Learn more &raquo;</a></p>
+            <p><a class="btn btn-outline-secondary" href="#">Learn more »</a></p>
         </div>
         <div class="col-md-6">
             <h2>List Your Items</h2>
             <p>Do you have a spare room, a car sitting idle, or tools gathering dust? List them on our platform and start earning money today. Manage your listings and bookings with ease.</p>
-            <p><a class="btn btn-outline-secondary" href="#">Become an Owner &raquo;</a></p>
+            <p><a class="btn btn-outline-secondary" href="#">Become an Owner »</a></p>
         </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
-        // You might want to include Bootstrap Icons CSS link in your _Layout.cshtml <head>
-        // <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+        // No additional scripts needed for now
     </script>
 }

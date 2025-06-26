@@ -1,11 +1,16 @@
 ﻿/* Custom styles for OnlineRentalSystem */
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(45deg, #2563eb, #85c1e9, #1d4ed8, #93c5fd);
-    background-size: 400% 400%;
-    animation: gradientAnimation 15s ease infinite;
-    min-height: 100vh; 
+    background-image: url('/images/baground.png'); /* Base background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+    position: relative; /* For overlay positioning */
 }
+
+    /* Gradient overlay with animation */
+    
 
 @keyframes gradientAnimation {
     0% {
@@ -52,4 +57,60 @@ body {
     position: relative;
     bottom: 0;
     width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 1.5rem;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 0.9rem;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .row > div {
+        margin-bottom: 20px;
+    }
+
+    .btn-lg {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+
+    .display-4 {
+        font-size: 2rem;
+    }
+
+    .fs-4 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .btn-lg {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+
+    .display-4 {
+        font-size: 1.5rem;
+    }
+
+    .fs-4 {
+        font-size: 1rem;
+    }
+
+    .row > div {
+        flex: 100%;
+        max-width: 100%;
+    }
 }

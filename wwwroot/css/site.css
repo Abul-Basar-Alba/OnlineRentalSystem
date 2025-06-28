@@ -1,7 +1,7 @@
 ﻿/* Custom styles for OnlineRentalSystem */
 body {
     font-family: 'Roboto', sans-serif;
-    background-image: linear-gradient(red,green) /*url('/images/baground.png')*/; /* Base background image */
+    background-image: url('/images/image1.jpg') /*url('/images/baground.png')*/; /* Base background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

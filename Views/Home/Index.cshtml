@@ -29,7 +29,7 @@
                     @* Admin Dashboard Link *@
                     @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Admin"))
                     {
-                        <a class="btn btn-primary btn-lg me-3 mb-2" asp-controller="Admin" asp-action="Index">
+                        <a class="btn btn-primary btn-lg me-3 mb-2" asp-controller="Account" asp-action="Admin">
                             <i class="bi bi-person-gear"></i> Admin Dashboard
                         </a>
                     }

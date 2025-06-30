@@ -37,7 +37,7 @@
                     @* Owner Dashboard Link *@
                     @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Seller"))
                     {
-                        <a class="btn btn-success btn-lg me-3 mb-2" asp-controller="Owner" asp-action="Index">
+                        <a class="btn btn-success btn-lg me-3 mb-2" asp-controller="PropertyTypes" asp-action="Index">
                             <i class="bi bi-house-door"></i> Owner Dashboard
                         </a>
                     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ namespace OnlineRentalSystem.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewBag.Roles=_roleManager.Roles.Where(p=>!p.Name.Equals("Admin")).Select(p=>new SelectListItem { Value=p.Name, Text=p.Name }).ToList();
             return View();
         }
 
@@ -55,16 +57,26 @@ namespace OnlineRentalSystem.Controllers
 
                 var result = await _userManager.CreateAsync(user, model.Password);
 
+
                 if (result.Succeeded)
                 {
                     // Optional: Assign a default role to new users, e.g., "Renter"
                     // You should ensure this role exists in your database first,
                     // perhaps through a seeding mechanism or admin UI.
-                    if (!await _roleManager.RoleExistsAsync("Renter"))
+                    if(!string.IsNullOrEmpty(model.Role))
                     {
-                        await _roleManager.CreateAsync(new IdentityRole("Renter"));
+                        if (!await _roleManager.RoleExistsAsync(model.Role))
+                        {
+                            await _roleManager.CreateAsync(new IdentityRole(model.Role));
+                        }
+                        await _userManager.AddToRoleAsync(user,model.Role);
                     }
-                    await _userManager.AddToRoleAsync(user, "Renter");
+                    else if (!await _roleManager.RoleExistsAsync("Admin"))
+                    {
+                        await _roleManager.CreateAsync(new IdentityRole("Admin"));
+                        await _userManager.AddToRoleAsync(user, "Admin");
+                    }
+                   
 
 
                     // Sign in the user immediately after successful registration
@@ -82,6 +94,9 @@ namespace OnlineRentalSystem.Controllers
             }
 
             // If ModelState is not valid or creation failed, return to the view with errors
+            ViewBag.Roles = _roleManager.Roles.Where(p => !p.Name.Equals("Admin")).Select(p => new SelectListItem { Value = p.Name, Text = p.Name }).ToList();
+
+            
             return View(model);
         }
 
@@ -89,6 +104,7 @@ namespace OnlineRentalSystem.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
+
             ViewData["ReturnUrl"] = returnUrl; // Store return URL for redirection after login
             return View();
         }
@@ -244,6 +260,23 @@ namespace OnlineRentalSystem.Controllers
             // Optionally set a default message or clear previous messages
             ViewBag.Message = "";
             ViewBag.IsSuccess = false;
+
+            return View();
+        }
+        [HttpGet]
+
+        [Authorize]
+        public async Task<IActionResult> Manage()
+        {
+            // Fetch all users and populate ViewBag.Users
+            var currentUser = await _userManager.GetUserAsync(User);
+             var currentUserRole=await _userManager.GetRolesAsync(currentUser);
+
+            // Fetch all roles and populate ViewBag.Roles (useful if you want a role dropdown too)
+            var roles = await _roleManager.Roles.ToListAsync();
+            ViewBag.Roles = currentUserRole;
+            ViewBag.UserDetails=currentUser;
+
 
             return View();
         }

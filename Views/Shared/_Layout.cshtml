@@ -41,13 +41,16 @@
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Properties" asp-action="Index">Listings</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="PropertyTypes" asp-action="Index">PropertyTypes</a>
+                                </li>
                             }
-                            @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Buyer"))
+                           @*  @if (currentUser != null && await UserManager.IsInRoleAsync(currentUser, "Buyer"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Bookings" asp-action="Index">Bookings</a>
                                 </li>
-                            }
+                            } *@
 
                         }
 
